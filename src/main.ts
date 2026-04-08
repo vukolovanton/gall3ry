@@ -9,20 +9,30 @@
 // ============================================================================
 
 import { gsap } from "gsap";
+import img01 from "./assets/img01.webp";
+import img02 from "./assets/img02.webp";
+import img03 from "./assets/img03.webp";
+import img04 from "./assets/img04.webp";
+import img05 from "./assets/img05.webp";
+import img06 from "./assets/img06.webp";
+import img07 from "./assets/img07.webp";
+import img08 from "./assets/img08.webp";
+import img09 from "./assets/img09.webp";
+import img10 from "./assets/img10.webp";
 
 const CONFIG = {
   // Image sources
   images: [
-    "./assets/img01.webp",
-    "./assets/img02.webp",
-    "./assets/img03.webp",
-    "./assets/img04.webp",
-    "./assets/img05.webp",
-    "./assets/img06.webp",
-    "./assets/img07.webp",
-    "./assets/img08.webp",
-    "./assets/img09.webp",
-    "./assets/img10.webp",
+    img01,
+    img02,
+    img03,
+    img04,
+    img05,
+    img06,
+    img07,
+    img08,
+    img09,
+    img10,
   ],
 
   // DOM element selectors
