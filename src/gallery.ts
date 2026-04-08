@@ -201,27 +201,40 @@ export class InfiniteGallery {
     this.stage = document.createElement("div");
     this.stage.className = "gall3ry-stage";
 
-    // Apply CSS custom properties for customization
-    this.stage.style.setProperty(
-      "--gall3ry-card-width",
-      this.options.cardWidth,
-    );
-    this.stage.style.setProperty(
-      "--gall3ry-card-aspect-ratio",
-      this.options.cardAspectRatio,
-    );
-    this.stage.style.setProperty(
-      "--gall3ry-card-border-radius",
-      this.options.cardBorderRadius,
-    );
-    this.stage.style.setProperty(
-      "--gall3ry-card-transform-origin",
-      this.options.cardTransformOrigin,
-    );
-    this.stage.style.setProperty(
-      "--gall3ry-stage-height",
-      this.options.stageHeight,
-    );
+    // Apply CSS custom properties from options (overrides CSS defaults)
+    if (this.options.cardWidth) {
+      this.stage.style.setProperty(
+        "--gall3ry-card-width",
+        this.options.cardWidth,
+      );
+    }
+    if (this.options.gap) {
+      this.stage.style.setProperty("--gall3ry-gap", this.options.gap + "px");
+    }
+    if (this.options.cardAspectRatio) {
+      this.stage.style.setProperty(
+        "--gall3ry-card-aspect-ratio",
+        this.options.cardAspectRatio,
+      );
+    }
+    if (this.options.cardBorderRadius) {
+      this.stage.style.setProperty(
+        "--gall3ry-card-border-radius",
+        this.options.cardBorderRadius,
+      );
+    }
+    if (this.options.cardTransformOrigin) {
+      this.stage.style.setProperty(
+        "--gall3ry-card-transform-origin",
+        this.options.cardTransformOrigin,
+      );
+    }
+    if (this.options.stageHeight) {
+      this.stage.style.setProperty(
+        "--gall3ry-stage-height",
+        this.options.stageHeight,
+      );
+    }
 
     // Create cards container
     this.cardsRoot = document.createElement("section");
@@ -480,7 +493,14 @@ export class InfiniteGallery {
     const r = sample.getBoundingClientRect();
     this.CARD_W = r.width || 300;
     this._CARD_H = r.height || 400;
-    this.STEP = this.CARD_W + this.options.gap;
+
+    // Dynamically read gap from CSS with fallback to options
+    const cssGap = getComputedStyle(this.stage)
+      .getPropertyValue("--gall3ry-gap")
+      .trim();
+    const actualGap = cssGap ? parseFloat(cssGap) : this.options.gap || 28;
+    this.STEP = this.CARD_W + actualGap;
+
     this.TRACK = this.items.length * this.STEP;
 
     this.items.forEach((it, i) => {

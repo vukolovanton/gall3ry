@@ -15,11 +15,38 @@
     /* Stage settings */
     --gall3ry-stage-height: 100vh;
 
-    /* Card settings */
-    --gall3ry-card-width: min(26vw, 360px);
+    /* Card settings - non-responsive values */
     --gall3ry-card-aspect-ratio: 1/1;
     --gall3ry-card-border-radius: 15px;
     --gall3ry-card-transform-origin: 90% center;
+
+    /* Responsive card width and gap - Mobile (Default): Shows ~2 cards */
+    --gall3ry-card-width: 45vw;
+    --gall3ry-gap: 16px;
+}
+
+/* Tablet: Shows ~4 cards */
+@media (min-width: 768px) {
+    :root {
+        --gall3ry-card-width: 23vw;
+        --gall3ry-gap: 24px;
+    }
+}
+
+/* Desktop: Shows ~6 cards */
+@media (min-width: 1200px) {
+    :root {
+        --gall3ry-card-width: 15vw;
+        --gall3ry-gap: 32px;
+    }
+}
+
+/* Ultra-wide: Caps width so cards don't get massive */
+@media (min-width: 1800px) {
+    :root {
+        --gall3ry-card-width: 300px;
+        --gall3ry-gap: 40px;
+    }
 }
 
 /* ============================================================================

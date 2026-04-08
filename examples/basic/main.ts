@@ -15,10 +15,32 @@ async function runApplication() {
   // 1. Create the instance
   const gallery = new InfiniteGallery({
     containerId: "cards", // Matches the <section id="cards">
-    images: [img01, img02, img03, img04, img05, img06, img07, img08, img09],
+    images: [
+      img01,
+      img02,
+      img03,
+      img04,
+      img05,
+      img06,
+      img07,
+      img08,
+      img09,
+      img01,
+      img02,
+      img03,
+    ],
     options: {
       friction: 0.9,
-      maxRotation: 28,
+      maxRotation: 12,
+      viewportThreshold: 1.2,
+      maxDepth: 200,
+      // Card dimensions can be set here to override CSS media query defaults
+      cardWidth: "15vw", // Any valid CSS width: "300px", "20vw", "min(25vw, 400px)"
+      gap: 10, // Gap between cards in pixels
+      // cardAspectRatio: "1/1",
+      // cardBorderRadius: "15px",
+      // cardTransformOrigin: "90% center",
+      // stageHeight: "100vh",
     },
   });
 
@@ -43,22 +65,6 @@ async function runApplication() {
   } catch (err) {
     console.error("Failed to start gallery:", err);
   }
-
-  // 4. Test the API Methods (Wiring up the UI buttons)
-  document.getElementById("btn-next")?.addEventListener("click", () => {
-    // Scroll to index 2 (the 3rd image), true = animate smoothly
-    gallery.scrollTo(2, true);
-  });
-
-  document.getElementById("btn-stop")?.addEventListener("click", () => {
-    gallery.stop();
-    console.log("Gallery paused.", gallery.getState());
-  });
-
-  document.getElementById("btn-start")?.addEventListener("click", () => {
-    gallery.start();
-    console.log("Gallery resumed.");
-  });
 }
 
 runApplication();
