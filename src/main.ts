@@ -20,6 +20,26 @@ import img08 from "./assets/img08.webp";
 import img09 from "./assets/img09.webp";
 import img10 from "./assets/img10.webp";
 
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+interface CarouselItem {
+  el: HTMLElement;
+  x: number;
+}
+
+interface VisibleCard {
+  item: CarouselItem;
+  screenX: number;
+  index: number;
+}
+
+// Extend Function interface for debounce property
+interface DebouncedFunction extends Function {
+  _t?: ReturnType<typeof setTimeout>;
+}
+
 const CONFIG = {
   // Image sources
   images: [
@@ -95,9 +115,8 @@ const cardsRoot = document.getElementById("cards");
 // ============================================================================
 
 // Carousel state
-let items = []; // Array of {el: HTMLElement, x: number}
-let positions = []; // Float32Array for wrapped positions
-let activeIndex = -1; // Currently centered card index
+let items: CarouselItem[] = []; // Array of {el: HTMLElement, x: number}
+let positions: Float32Array | number[] = []; // Float32Array for wrapped positions
 let isEntering = true; // Prevents interaction during entry animation
 
 // Layout measurements
@@ -112,7 +131,7 @@ let VW_HALF = window.innerWidth * 0.5;
 let vX = 0; // Velocity in X direction
 
 // Animation frame IDs
-let rafId = null; // Carousel animation frame
+let rafId: number | null = null; // Carousel animation frame
 let lastTime = 0; // Last frame timestamp
 
 // Background gradient state
@@ -127,7 +146,7 @@ let lastTime = 0; // Last frame timestamp
  * @param {number} m - The divisor
  * @returns {number} The positive remainder
  */
-function mod(n, m) {
+function mod(n: number, m: number): number {
   return ((n % m) + m) % m;
 }
 
@@ -139,10 +158,10 @@ function mod(n, m) {
  * Preload images using link tags for browser optimization
  * @param {string[]} srcs - Array of image URLs
  */
-function preloadImageLinks(srcs) {
+function preloadImageLinks(srcs: string[]): void {
   if (!document.head) return;
 
-  srcs.forEach((href) => {
+  srcs.forEach((href: string) => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
@@ -156,12 +175,12 @@ function preloadImageLinks(srcs) {
  * Wait for all card images to finish loading
  * @returns {Promise<void>}
  */
-function waitForImages() {
-  const promises = items.map((it) => {
-    const img = it.el.querySelector("img");
+function waitForImages(): Promise<void[]> {
+  const promises = items.map((it: CarouselItem) => {
+    const img = it.el.querySelector("img") as HTMLImageElement | null;
     if (!img || img.complete) return Promise.resolve();
 
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       const done = () => resolve();
       img.addEventListener("load", done, { once: true });
       img.addEventListener("error", done, { once: true });
@@ -175,16 +194,18 @@ function waitForImages() {
  * Decode all images to prevent jank during first interaction
  * @returns {Promise<void>}
  */
-async function decodeAllImages() {
-  const tasks = items.map((it) => {
-    const img = it.el.querySelector("img");
-    if (!img) return Promise.resolve();
+async function decodeAllImages(): Promise<void> {
+  const tasks = items.map(async (it: CarouselItem) => {
+    const img = it.el.querySelector("img") as HTMLImageElement | null;
+    if (!img) return;
 
     if (typeof img.decode === "function") {
-      return img.decode().catch(() => {});
+      try {
+        await img.decode();
+      } catch {
+        // Ignore decode errors
+      }
     }
-
-    return Promise.resolve();
   });
 
   await Promise.allSettled(tasks);
@@ -197,7 +218,8 @@ async function decodeAllImages() {
 /**
  * Create card DOM elements from image array
  */
-function createCards() {
+function createCards(): void {
+  if (!cardsRoot) return;
   cardsRoot.innerHTML = "";
   items = [];
 
@@ -228,7 +250,7 @@ function createCards() {
 /**
  * Measure card dimensions and calculate layout
  */
-function measure() {
+function measure(): void {
   const sample = items[0]?.el;
   if (!sample) return;
 
@@ -239,7 +261,7 @@ function measure() {
   TRACK = items.length * STEP;
 
   // Set initial positions
-  items.forEach((it, i) => {
+  items.forEach((it: CarouselItem, i: number) => {
     it.x = i * STEP;
   });
 
@@ -250,7 +272,7 @@ function measure() {
 // TRANSFORM CALCULATIONS
 // ============================================================================
 
-function computeTransformComponents(screenX) {
+function computeTransformComponents(screenX: number) {
   const norm = Math.max(-1, Math.min(1, screenX / VW_HALF));
   const absNorm = Math.abs(norm);
   const invNorm = 1 - absNorm;
@@ -267,7 +289,10 @@ function computeTransformComponents(screenX) {
  * @param {number} screenX - Card's X position relative to viewport center
  * @returns {{transform: string, z: number}} Transform string and Z-depth
  */
-function transformForScreenX(screenX) {
+function transformForScreenX(screenX: number): {
+  transform: string;
+  z: number;
+} {
   const { ry, tz, scale } = computeTransformComponents(screenX);
 
   return {
@@ -333,7 +358,7 @@ function updateCarouselTransforms() {
  * Main animation loop for carousel movement
  * @param {number} t - Current timestamp
  */
-function tick(t) {
+function tick(t: number): void {
   const dt = lastTime ? (t - lastTime) / 1000 : 0;
   lastTime = t;
 
@@ -367,7 +392,7 @@ function startCarousel() {
 /**
  * Stop the carousel animation loop
  */
-function cancelCarousel() {
+function cancelCarousel(): void {
   if (rafId) cancelAnimationFrame(rafId);
   rafId = null;
 }
@@ -375,7 +400,7 @@ function cancelCarousel() {
 /**
  * Handle window resize
  */
-function onResize() {
+function onResize(): void {
   const prevStep = STEP || 1;
   const ratio = SCROLL_X / (items.length * prevStep);
   measure();
@@ -384,21 +409,30 @@ function onResize() {
   updateCarouselTransforms();
 }
 
+// Extend the onResize function with debounce property
+(onResize as DebouncedFunction)._t = undefined;
+
 // Mouse wheel scrolling
-stage.addEventListener(
-  "wheel",
-  (e) => {
-    if (isEntering) return;
-    e.preventDefault();
+if (stage) {
+  stage.addEventListener(
+    "wheel",
+    (e) => {
+      if (isEntering) return;
+      e.preventDefault();
 
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    vX += delta * CONFIG.physics.wheelSensitivity * 20;
-  },
-  { passive: false },
-);
+      const wheelEvent = e as WheelEvent;
+      const delta =
+        Math.abs(wheelEvent.deltaX) > Math.abs(wheelEvent.deltaY)
+          ? wheelEvent.deltaX
+          : wheelEvent.deltaY;
+      vX += delta * CONFIG.physics.wheelSensitivity * 20;
+    },
+    { passive: false },
+  );
 
-// Prevent default drag behavior
-stage.addEventListener("dragstart", (e) => e.preventDefault());
+  // Prevent default drag behavior
+  stage.addEventListener("dragstart", (e) => e.preventDefault());
+}
 
 // Drag state
 let dragging = false;
@@ -407,45 +441,56 @@ let lastT = 0;
 let lastDelta = 0;
 
 // Pointer down - start dragging
-stage.addEventListener("pointerdown", (e) => {
-  if (isEntering) return;
-  if (e.target.closest(".frame")) return;
+if (stage) {
+  stage.addEventListener("pointerdown", (e) => {
+    if (isEntering) return;
+    const target = e.target as HTMLElement;
+    if (target.closest(".frame")) return;
 
-  dragging = true;
-  lastX = e.clientX;
-  lastT = performance.now();
-  lastDelta = 0;
-  stage.setPointerCapture(e.pointerId);
-  stage.classList.add("dragging");
-});
+    dragging = true;
+    lastX = (e as PointerEvent).clientX;
+    lastT = performance.now();
+    lastDelta = 0;
+    stage.setPointerCapture((e as PointerEvent).pointerId);
+    stage.classList.add("dragging");
+  });
+}
 
 // Pointer move - update scroll position
-stage.addEventListener("pointermove", (e) => {
-  if (!dragging) return;
+if (stage) {
+  stage.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
 
-  const now = performance.now();
-  const dx = e.clientX - lastX;
-  const dt = Math.max(1, now - lastT) / 1000;
+    const now = performance.now();
+    const pointerEvent = e as PointerEvent;
+    const dx = pointerEvent.clientX - lastX;
+    const dt = Math.max(1, now - lastT) / 1000;
 
-  SCROLL_X = mod(SCROLL_X - dx * CONFIG.physics.dragSensitivity, TRACK);
-  lastDelta = dx / dt; // Track velocity for momentum
-  lastX = e.clientX;
-  lastT = now;
-});
+    SCROLL_X = mod(SCROLL_X - dx * CONFIG.physics.dragSensitivity, TRACK);
+    lastDelta = dx / dt; // Track velocity for momentum
+    lastX = pointerEvent.clientX;
+    lastT = now;
+  });
+}
 
 // Pointer up - apply momentum
-stage.addEventListener("pointerup", (e) => {
-  if (!dragging) return;
-  dragging = false;
-  stage.releasePointerCapture(e.pointerId);
-  vX = -lastDelta * CONFIG.physics.dragSensitivity; // Apply final velocity
-  stage.classList.remove("dragging");
-});
+if (stage) {
+  stage.addEventListener("pointerup", (e) => {
+    if (!dragging) return;
+    dragging = false;
+    stage.releasePointerCapture((e as PointerEvent).pointerId);
+    vX = -lastDelta * CONFIG.physics.dragSensitivity; // Apply final velocity
+    stage.classList.remove("dragging");
+  });
+}
 
 // Debounced resize handler
 window.addEventListener("resize", () => {
-  clearTimeout(onResize._t);
-  onResize._t = setTimeout(onResize, CONFIG.performance.resizeDebounce);
+  clearTimeout((onResize as DebouncedFunction)._t);
+  (onResize as DebouncedFunction)._t = setTimeout(
+    onResize,
+    CONFIG.performance.resizeDebounce,
+  );
 });
 
 // Pause animations when tab is hidden
@@ -465,12 +510,12 @@ document.addEventListener("visibilitychange", () => {
  * Animate visible cards entering the scene
  * @param {Array} visibleCards - Cards to animate
  */
-async function animateEntry(visibleCards) {
-  await new Promise((r) => requestAnimationFrame(r));
+async function animateEntry(visibleCards: VisibleCard[]): Promise<void> {
+  await new Promise<void>((r) => requestAnimationFrame(() => r()));
 
   const tl = gsap.timeline();
 
-  visibleCards.forEach(({ item, screenX }, idx) => {
+  visibleCards.forEach(({ item, screenX }: VisibleCard, idx: number) => {
     const state = { p: 0 }; // 0 -> 1
     const { ry, tz, scale: baseScale } = computeTransformComponents(screenX);
 
@@ -491,7 +536,7 @@ async function animateEntry(visibleCards) {
         duration: CONFIG.entry.duration,
         ease: CONFIG.entry.ease,
         onUpdate: () => {
-          const t = state.p;
+          const t: number = state.p;
 
           const currentScale = START_SCALE + (baseScale - START_SCALE) * t;
           const currentY = START_Y * (1 - t);
@@ -523,7 +568,7 @@ async function animateEntry(visibleCards) {
 /**
  * Pre-composite all card positions to prevent first-interaction jank
  */
-async function warmupCompositing() {
+async function warmupCompositing(): Promise<void> {
   const originalScrollX = SCROLL_X;
   const stepSize = STEP * CONFIG.performance.compositingStepFactor;
   const numSteps = Math.ceil(TRACK / stepSize);
@@ -535,15 +580,15 @@ async function warmupCompositing() {
 
     // Force paint every few steps (optimization)
     if (i % CONFIG.performance.compositingPaintInterval === 0) {
-      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
     }
   }
 
   // Return to original position
   SCROLL_X = originalScrollX;
   updateCarouselTransforms();
-  await new Promise((r) => requestAnimationFrame(r));
-  await new Promise((r) => requestAnimationFrame(r));
+  await new Promise<void>((r) => requestAnimationFrame(() => r()));
+  await new Promise<void>((r) => requestAnimationFrame(() => r()));
 }
 
 /**
@@ -574,7 +619,7 @@ async function init() {
     );
 
     updateCarouselTransforms();
-    stage.classList.add("carousel-mode");
+    stage?.classList.add("carousel-mode");
 
     // Wait for all images to load
     console.log("DEBUG: waiting for images to load...");
@@ -660,7 +705,9 @@ async function init() {
     console.log("DEBUG: init() complete");
   } catch (error) {
     console.error("ERROR in init():", error);
-    console.error("Stack trace:", error.stack);
+    if (error instanceof Error) {
+      console.error("Stack trace:", error.stack);
+    }
   }
 }
 
