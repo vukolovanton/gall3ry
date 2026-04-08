@@ -39,7 +39,6 @@ const CONFIG = {
   selectors: {
     stage: ".stage",
     cards: "cards",
-    loader: "loader",
   },
 
   // Physics parameters
@@ -90,7 +89,6 @@ const CONFIG = {
 
 const stage = document.querySelector(".stage");
 const cardsRoot = document.getElementById("cards");
-const loader = document.getElementById("loader");
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -209,6 +207,7 @@ function createCards() {
     const card = document.createElement("article");
     card.className = "card";
     card.style.willChange = "transform"; // Force GPU compositing
+    card.style.opacity = "0"; // Hide cards initially to prevent jump before entry animation
 
     const img = new Image();
     img.className = "card__img";
@@ -642,15 +641,15 @@ async function init() {
     // Sort cards left to right
     visibleCards.sort((a, b) => a.screenX - b.screenX);
 
-    // Hide loader
-    console.log("DEBUG: hiding loader, loader =", loader);
-    if (loader) loader.classList.add("loader--hide");
-    console.log("DEBUG: loader hidden");
-
     // Animate cards entering
     console.log("DEBUG: starting entry animation...");
     await animateEntry(visibleCards);
     console.log("DEBUG: entry animation complete");
+
+    // Ensure all cards are visible for infinite scrolling
+    items.forEach((it) => {
+      it.el.style.opacity = "1";
+    });
 
     // Enable user interaction
     isEntering = false;
@@ -662,8 +661,6 @@ async function init() {
   } catch (error) {
     console.error("ERROR in init():", error);
     console.error("Stack trace:", error.stack);
-    // Hide loader even if there's an error
-    if (loader) loader.classList.add("loader--hide");
   }
 }
 
@@ -674,6 +671,4 @@ async function init() {
 init().catch((error) => {
   console.error("ERROR: init() promise rejected:", error);
   console.error("Stack trace:", error.stack);
-  // Hide loader even if there's an error
-  if (loader) loader.classList.add("loader--hide");
 });
