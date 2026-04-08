@@ -495,7 +495,7 @@ export class InfiniteGallery {
     this._CARD_H = r.height || 400;
 
     // Dynamically read gap from CSS with fallback to options
-    const cssGap = getComputedStyle(this.stage)
+    const cssGap = getComputedStyle(this.stage!)
       .getPropertyValue("--gall3ry-gap")
       .trim();
     const actualGap = cssGap ? parseFloat(cssGap) : this.options.gap || 28;
