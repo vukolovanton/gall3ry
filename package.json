@@ -1,6 +1,6 @@
 {
   "name": "gall3ry",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A smooth, infinite-scrolling 3D carousel gallery with dynamic animations",
   "type": "module",
   "main": "./dist/index.cjs",
