@@ -1,4 +1,4 @@
-import { InfiniteGallery } from "./gallery.ts";
+import { InfiniteGallery } from "../../src/index.ts";
 
 // Import your images (Vite handles this)
 import img01 from "./assets/img01.webp";

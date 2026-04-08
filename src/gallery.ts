@@ -70,7 +70,7 @@ interface DebouncedFunction extends Function {
 // DEFAULT CONFIGURATION
 // ============================================================================
 
-const DEFAULTS = {
+export const DEFAULTS = {
   friction: 0.9,
   wheelSensitivity: 0.6,
   wheelMaxDelta: 50,
@@ -118,7 +118,8 @@ export class InfiniteGallery {
 
   // Layout measurements
   private CARD_W: number = 300;
-  private CARD_H: number = 400;
+  // @ts-ignore - Reserved for future use
+  private _CARD_H: number = 400;
   private STEP: number = 328;
   private TRACK: number = 0;
   private SCROLL_X: number = 0;
@@ -398,7 +399,7 @@ export class InfiniteGallery {
 
     const r = sample.getBoundingClientRect();
     this.CARD_W = r.width || 300;
-    this.CARD_H = r.height || 400;
+    this._CARD_H = r.height || 400;
     this.STEP = this.CARD_W + this.options.gap;
     this.TRACK = this.items.length * this.STEP;
 

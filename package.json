@@ -1,18 +1,53 @@
 {
   "name": "gall3ry",
-  "private": true,
   "version": "0.0.0",
+  "description": "A smooth, infinite-scrolling 3D carousel gallery with dynamic animations",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/gall3ry.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "vite -c vite.demo.config.ts",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build:demo": "vite build -c vite.demo.config.ts",
+    "preview": "vite preview -c vite.demo.config.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "carousel",
+    "gallery",
+    "3d",
+    "infinite-scroll",
+    "gsap",
+    "animation",
+    "typescript"
+  ],
+  "author": "Anton Vukolov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vukolovanton/gall3ry"
+  },
+  "peerDependencies": {
+    "gsap": "^3.14.0"
   },
   "devDependencies": {
     "typescript": "~6.0.2",
-    "vite": "^8.0.4"
-  },
-  "dependencies": {
+    "vite": "^8.0.4",
     "gsap": "^3.14.2"
   }
 }

@@ -1,497 +1,433 @@
-# Infinite 3D Gallery - NPM Package Plan
+# gall3ry
 
-## 🎯 Package Concept
+<div align="center">
 
-Transform the current infinite gradient 3D carousel into a reusable, installable npm package that developers can easily integrate into their projects.
+![gall3ry](https://img.shields.io/npm/v/gall3ry)
+![License](https://img.shields.io/npm/l/gall3ry)
+![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
+![Size](https://img.shields.io/bundlephobia/minzip/gall3ry)
 
-**Package Name:** `@gall3ry/infinite-carousel` (suggested)
+*A smooth, infinite-scrolling 3D carousel gallery with beautiful animations*
+
+[Demo](#demo) • [Installation](#installation) • [Usage](#usage) • [API](#api) • [Options](#options)
+
+</div>
 
 ---
 
-## 📦 Planned Public API
+## ✨ Features
 
-### Installation
+- 🎨 **Stunning 3D Transforms** - Smooth perspective-based card rotations and depth effects
+- ♾️ **Infinite Scrolling** - Seamlessly loop through images with physics-based momentum
+- ⚡ **Performance Optimized** - Efficient rendering with viewport-based card visibility
+- 🎯 **Touch & Mouse Support** - Smooth dragging and wheel scrolling
+- 📱 **Responsive Design** - Adapts to any screen size
+- 🎭 **Blur Effects** - Dynamic blur for out-of-focus cards
+- ⚙️ **Highly Customizable** - Extensive configuration options
+- 📦 **TypeScript Support** - Full type definitions included
+- 🌙 **Lightweight** - ~13KB minified (3.5KB gzipped)
+
+---
+
+## 🙏 Acknowledgments
+
+This project is based on the excellent work by **[Clément Grellier](https://github.com/clementgrellier)** and his [GradientSlider](https://github.com/clementgrellier/gradientslider) project. Thank you for the inspiration and foundation!
+
+---
+
+## 📦 Installation
+
 ```bash
-npm install @gall3ry/infinite-carousel
-# or
-yarn add @gall3ry/infinite-carousel
-# or
-pnpm add @gall3ry/infinite-carousel
+# npm
+npm install gall3ry
+
+# yarn
+yarn add gall3ry
+
+# pnpm
+pnpm add gall3ry
 ```
 
-### Usage
-```typescript
-import { InfiniteGallery } from '@gall3ry/infinite-carousel';
+**Required Peer Dependency:**
 
-// Initialize the gallery
+gall3ry requires **GSAP** as a peer dependency. Install it separately:
+
+```bash
+npm install gsap
+```
+
+---
+
+## 🚀 Quick Start
+
+```typescript
+import { InfiniteGallery } from 'gall3ry';
+
 const gallery = new InfiniteGallery({
-  containerId: 'my-gallery-container',
+  containerId: 'my-gallery',
   images: [
     'https://example.com/image1.jpg',
     'https://example.com/image2.jpg',
-    // ... more images
+    'https://example.com/image3.jpg',
   ],
   options: {
-    // Optional configuration
     friction: 0.9,
-    wheelSensitivity: 0.6,
-    // ... other config options
-  }
+    maxRotation: 28,
+    gap: 28,
+  },
 });
+
+// Initialize the gallery
+await gallery.initialize();
 ```
 
-### API Methods
+HTML:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Gallery</title>
+</head>
+<body>
+  <section id="my-gallery"></section>
+  
+  <script type="module">
+    import { InfiniteGallery } from 'gall3ry';
+    
+    const gallery = new InfiniteGallery({
+      containerId: 'my-gallery',
+      images: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
+    });
+    
+    await gallery.initialize();
+  </script>
+</body>
+</html>
+```
+
+---
+
+## 💻 Usage Examples
+
+### Basic Example
+
 ```typescript
-// Start/stop the carousel
-gallery.start();
-gallery.stop();
+import { InfiniteGallery } from 'gall3ry';
 
-// Scroll to specific card
-gallery.scrollTo(index: number);
-
-// Get current state
-gallery.getState(): { currentIndex: number, scrollPosition: number };
-
-// Destroy and cleanup
-gallery.destroy();
-```
-
----
-
-## 🏗️ Architecture Plan
-
-### 1. Package Structure
-```
-@gall3ry/infinite-carousel/
-├── src/
-│   ├── index.ts              # Main entry point, exports public API
-│   ├── InfiniteGallery.ts    # Main class with gallery logic
-│   ├── types.ts              # TypeScript type definitions
-│   ├── config.ts             # Default configuration
-│   ├── utils/
-│   │   ├── mod.ts           # Utility functions
-│   │   ├── transforms.ts    # 3D transform calculations
-│   │   └── events.ts        # Event handling
-│   ├── carousel/
-│   │   ├── createCards.ts   # Card creation logic
-│   │   ├── transforms.ts    # Transform updates
-│   │   └── animation.ts     # Animation loop
-│   └── styles/
-│       └── index.css        # Package styles (bundled)
-├── dist/                     # Build output (gitignored)
-├── examples/
-│   ├── basic/
-│   │   ├── index.html
-│   │   └── main.ts
-│   └── advanced/
-│       ├── index.html
-│       └── main.ts
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── README.md
-```
-
-### 2. Core Classes
-
-#### `InfiniteGallery` Class
-```typescript
-class InfiniteGallery {
-  constructor(config: GalleryConfig);
-  
-  // Lifecycle
-  initialize(): Promise<void>;
-  destroy(): void;
-  
-  // Control
-  start(): void;
-  stop(): void;
-  scrollTo(index: number, animate?: boolean): void;
-  
-  // State
-  getState(): GalleryState;
-  
-  // Events
-  on(event: GalleryEvent, callback: Function): void;
-  off(event: GalleryEvent, callback: Function): void;
-}
-```
-
-### 3. Type Definitions
-```typescript
-// types.ts
-export interface GalleryConfig {
-  containerId: string;
-  images: string[];
-  options?: Partial<GalleryOptions>;
-}
-
-export interface GalleryOptions {
-  // Physics
-  friction: number;
-  wheelSensitivity: number;
-  dragSensitivity: number;
-  
-  // Visuals
-  maxRotation: number;
-  maxDepth: number;
-  minScale: number;
-  scaleRange: number;
-  gap: number;
-  
-  // Blur
-  maxBlur: number;
-  blurExponent: number;
-  
-  // Animation
-  entryAnimation: {
-    enabled: boolean;
-    duration: number;
-    stagger: number;
-    ease: string;
-  };
-  
-  // Performance
-  viewportThreshold: number;
-  resizeDebounce: number;
-}
-
-export interface GalleryState {
-  currentIndex: number;
-  scrollPosition: number;
-  isAnimating: boolean;
-  isDragging: boolean;
-}
-
-export type GalleryEvent = 
-  | 'ready' 
-  | 'cardChange' 
-  | 'scrollStart' 
-  | 'scrollEnd'
-  | 'destroy';
-```
-
----
-
-## 📋 Development Roadmap
-
-### Phase 1: Code Refactoring (Week 1-2)
-- [ ] Extract `InfiniteGallery` class from current `main.ts`
-- [ ] Separate concerns into modules (carousel, utils, events)
-- [ ] Create proper TypeScript interfaces
-- [ ] Remove HTML coupling (container should be provided, not hardcoded)
-- [ ] Make styles injectable or bundled
-- [ ] Remove hardcoded selectors
-- [ ] Remove debug console.log statements
-
-### Phase 2: Package Setup (Week 2-3)
-- [ ] Update `package.json` for npm package
-- [ ] Configure build process (Vite/ Rollup)
-- [ ] Set up TypeScript configuration for library mode
-- [ ] Configure CSS bundling
-- [ ] Set up proper exports (ESM, CJS, UMD)
-- [ ] Create package entry points
-
-### Phase 3: Build System (Week 3)
-- [ ] Configure Vite for library build
-- [ ] Generate type definitions (.d.ts)
-- [ ] Bundle CSS (option to include or exclude)
-- [ ] Set up source maps
-- [ ] Configure tree-shaking for optimal bundle size
-- [ ] Test build output
-
-### Phase 4: Documentation & Examples (Week 3-4)
-- [ ] Write comprehensive README
-- [ ] Create basic usage example
-- [ ] Create advanced usage example
-- [ ] Add JSDoc comments to all public APIs
-- [ ] Create interactive demo (Storybook or similar)
-- [ ] Add API reference documentation
-
-### Phase 5: Testing (Week 4)
-- [ ] Set up testing framework (Vitest)
-- [ ] Write unit tests for core functions
-- [ ] Write integration tests for gallery lifecycle
-- [ ] Test in different browsers
-- [ ] Test bundle size
-- [ ] Performance testing
-
-### Phase 6: Publishing (Week 5)
-- [ ] Choose package name and register on npm
-- [ ] Configure CI/CD (GitHub Actions)
-- [ ] Automated testing on PRs
-- [ ] Automated publishing on version tags
-- [ ] Create CHANGELOG.md
-- [ ] Set up semantic versioning
-- [ ] Publish version 1.0.0
-
----
-
-## 🛠️ Technical Decisions
-
-### Build Tool
-**Choice: Vite**
-- Fast, modern build tool
-- Already used in the project
-- Excellent library mode support
-- Built-in TypeScript support
-- Good CSS handling
-
-### Module Formats
-**Support: ESM (primary), CJS (secondary)**
-- ESM for modern bundlers and browsers
-- CJS for Node.js compatibility
-- Tree-shaking support for optimal bundle size
-
-### Dependencies Management
-**GSAP as peer dependency**
-```json
-{
-  "peerDependencies": {
-    "gsap": "^3.14.0"
-  },
-  "devDependencies": {
-    "gsap": "^3.14.0"
-  }
-}
-```
-
-**Reasoning:** 
-- Keeps package size smaller
-- Allows users to control GSAP version
-- Prevents duplicate GSAP instances
-
-### CSS Strategy
-**Two options:**
-
-**Option A: Bundled CSS (Recommended)**
-- CSS bundled with JS
-- Automatically injected on initialization
-- Simplest for users
-- Can opt-out with configuration
-
-**Option B: Separate CSS file**
-- User must import CSS separately
-- More control for advanced users
-- Smaller JS bundle
-- Requires additional import
-
-**Decision:** Option A (bundled) with opt-out capability
-
-### TypeScript Support
-- Full type definitions included
-- Exported as `.d.ts` files
-- Strict type checking enabled
-- Public APIs fully typed
-
----
-
-## 📝 Package.json Configuration
-
-```json
-{
-  "name": "@gall3ry/infinite-carousel",
-  "version": "1.0.0",
-  "description": "A smooth, infinite-scrolling 3D carousel with dynamic gradient backgrounds",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./style.css": "./dist/style.css"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+const gallery = new InfiniteGallery({
+  containerId: 'gallery',
+  images: [
+    '/images/photo1.jpg',
+    '/images/photo2.jpg',
+    '/images/photo3.jpg',
   ],
-  "keywords": [
-    "carousel",
-    "gallery",
-    "3d",
-    "infinite-scroll",
-    "gsap",
-    "animation",
-    "typescript"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/gall3ry.git"
-  },
-  "peerDependencies": {
-    "gsap": "^3.14.0"
-  },
-  "devDependencies": {
-    "typescript": "~6.0.2",
-    "vite": "^8.0.4",
-    "gsap": "^3.14.2",
-    "vitest": "^2.0.0"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build && tsc --emitDeclarationOnly",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "preview": "vite preview",
-    "lint": "eslint src",
-    "format": "prettier --write src"
-  }
-}
+});
+
+await gallery.initialize();
 ```
 
----
+### With Event Listeners
 
-## 🎨 Styling Strategy
-
-### CSS Scoping
-- Use BEM-like naming: `.ig-card`, `.ig-stage`, etc.
-- Prefix with `ig-` (Infinite Gallery) to avoid conflicts
-- Make styles customizable via CSS variables
-
-### CSS Variables
-```css
-:root {
-  --ig-perspective: 1800px;
-  --ig-card-width: 360px;
-  --ig-card-aspect-ratio: 4/5;
-  --ig-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --ig-bg: #f0f0f0;
-  --ig-fg: #0b0b0b;
-}
-```
-
-### Customization
 ```typescript
 const gallery = new InfiniteGallery({
   containerId: 'gallery',
-  images: [...],
-  options: {
-    cssVariables: {
-      '--ig-card-width': '400px',
-      '--ig-bg': '#000000'
-    }
-  }
+  images: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
 });
+
+// Listen for when the gallery is ready
+gallery.on('ready', () => {
+  console.log('Gallery is ready!');
+});
+
+// Listen for card changes
+gallery.on('cardChange', (data) => {
+  console.log(`Active card: ${data.index}, Direction: ${data.direction}`);
+});
+
+// Listen for user interactions
+gallery.on('scrollStart', () => {
+  console.log('User started scrolling');
+});
+
+gallery.on('scrollEnd', () => {
+  console.log('User stopped scrolling');
+});
+
+await gallery.initialize();
+```
+
+### Programmatic Control
+
+```typescript
+const gallery = new InfiniteGallery({
+  containerId: 'gallery',
+  images: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
+});
+
+await gallery.initialize();
+
+// Scroll to a specific card (0-indexed)
+gallery.scrollTo(2, true); // true = animate
+
+// Get current state
+const state = gallery.getState();
+console.log('Current index:', state.currentIndex);
+console.log('Scroll position:', state.scrollX);
+console.log('Velocity:', state.velocity);
+console.log('Is dragging:', state.isDragging);
+
+// Stop/start the gallery
+gallery.stop();
+// ... do something ...
+gallery.start();
+
+// Cleanup when done
+gallery.destroy();
+```
+
+### With Custom Options
+
+```typescript
+const gallery = new InfiniteGallery({
+  containerId: 'gallery',
+  images: ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4.jpg'],
+  options: {
+    // Physics
+    friction: 0.95,              // How quickly momentum decays (0-1)
+    wheelSensitivity: 0.5,       // Mouse wheel sensitivity
+    dragSensitivity: 1.0,        // Touch/drag sensitivity
+    minVelocityThreshold: 0.02,  // Minimum velocity to keep scrolling
+    
+    // Visuals
+    maxRotation: 35,             // Maximum card rotation in degrees
+    maxDepth: 150,               // Maximum z-axis depth
+    minScale: 0.9,               // Minimum scale for distant cards
+    scaleRange: 0.15,            // Scale variation range
+    gap: 40,                     // Gap between cards in pixels
+    
+    // Blur
+    maxBlur: 3,                  // Maximum blur for distant cards
+    exponent: 1.2,               // Blur curve exponent
+    
+    // Animation
+    duration: 0.8,               // Entry animation duration
+    stagger: 0.08,               // Stagger between cards
+    ease: 'power3.out',          // Easing function
+    
+    // Performance
+    viewportThreshold: 0.6,      // Cards outside viewport are hidden
+    resizeDebounce: 100,         // Debounce resize events (ms)
+  },
+});
+
+await gallery.initialize();
 ```
 
 ---
 
-## 🧪 Testing Strategy
+## 📖 API Reference
 
-### Unit Tests
-- Utility functions (mod, transforms)
-- Configuration validation
-- State management
-- Event handling
+### Constructor
 
-### Integration Tests
-- Gallery initialization
-- Card creation and rendering
-- Scroll behavior
-- Animation lifecycle
-- Cleanup/destruction
+```typescript
+new InfiniteGallery(config: GalleryConfig)
+```
 
-### Visual Regression Tests
-- Snapshot testing with Playwright
-- Compare renders across browsers
-- Test responsive behavior
+**Parameters:**
 
-### Performance Tests
-- Bundle size monitoring
-- FPS during scrolling
-- Memory usage
-- Load time
+- `config.containerId` (`string`) - ID of the HTML element to contain the gallery
+- `config.images` (`string[]`) - Array of image URLs
+- `config.options?` (`Partial<GalleryOptions>`) - Optional configuration options
+
+### Methods
+
+#### `initialize()`
+
+Initialize and start the gallery with entry animation.
+
+```typescript
+await gallery.initialize(): Promise<void>
+```
+
+#### `destroy()`
+
+Clean up and remove the gallery from the DOM.
+
+```typescript
+gallery.destroy(): void
+```
+
+#### `start()`
+
+Resume animation and physics.
+
+```typescript
+gallery.start(): void
+```
+
+#### `stop()`
+
+Pause animation and physics.
+
+```typescript
+gallery.stop(): void
+```
+
+#### `scrollTo(index, animate?)`
+
+Scroll to a specific card.
+
+```typescript
+gallery.scrollTo(index: number, animate: boolean = true): void
+```
+
+**Parameters:**
+
+- `index` - Card index (0-based)
+- `animate` - Whether to animate the scroll (default: `true`)
+
+#### `getState()`
+
+Get the current state of the gallery.
+
+```typescript
+gallery.getState(): GalleryState
+```
+
+**Returns:**
+
+```typescript
+{
+  currentIndex: number,    // Currently active card index
+  scrollX: number,         // Current scroll position
+  velocity: number,        // Current velocity
+  isDragging: boolean,     // Whether user is dragging
+  isAnimating: boolean,    // Whether gallery is animating
+}
+```
+
+#### `on(event, callback)`
+
+Add an event listener.
+
+```typescript
+gallery.on(event: GalleryEvent, callback: Function): void
+```
+
+**Events:**
+
+- `'ready'` - Gallery is fully initialized and animated in
+- `'cardChange'` - Active card changed
+- `'scrollStart'` - User started interacting
+- `'destroy'` - Gallery was destroyed
+
+#### `off(event, callback)`
+
+Remove an event listener.
+
+```typescript
+gallery.off(event: GalleryEvent, callback: Function): void
+```
 
 ---
 
-## 📊 Bundle Size Targets
+## ⚙️ Configuration Options
 
-- **Minified JS:** < 15 KB (gzip)
-- **CSS:** < 5 KB (gzip)
-- **Total:** < 20 KB (gzip, excluding GSAP)
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| **Physics** | | | |
+| `friction` | `number` | `0.9` | How quickly momentum decays (0-1) |
+| `wheelSensitivity` | `number` | `0.6` | Mouse wheel scroll sensitivity |
+| `wheelMaxDelta` | `number` | `50` | Maximum wheel delta per event |
+| `wheelMinDelta` | `number` | `1` | Minimum wheel delta to trigger scroll |
+| `dragSensitivity` | `number` | `1.0` | Touch/drag sensitivity |
+| `minVelocityThreshold` | `number` | `0.02` | Minimum velocity to keep scrolling |
+| `frictionDecayBase` | `number` | `60` | Base for friction decay calculation |
+| **Visuals** | | | |
+| `maxRotation` | `number` | `28` | Maximum card rotation in degrees |
+| `maxDepth` | `number` | `140` | Maximum z-axis depth for cards |
+| `minScale` | `number` | `0.92` | Minimum scale for distant cards |
+| `scaleRange` | `number` | `0.1` | Scale variation range |
+| `gap` | `number` | `28` | Gap between cards in pixels |
+| **Blur** | | | |
+| `maxBlur` | `number` | `2` | Maximum blur for distant cards (px) |
+| `exponent` | `number` | `1.1` | Blur curve exponent |
+| **Animation** | | | |
+| `startScale` | `number` | `0.92` | Starting scale for entry animation |
+| `startY` | `number` | `40` | Starting Y position for entry animation |
+| `duration` | `number` | `0.6` | Entry animation duration (seconds) |
+| `stagger` | `number` | `0.05` | Stagger between cards during entry |
+| `ease` | `string` | `'power3.out'` | GSAP easing function |
+| **Performance** | | | |
+| `viewportThreshold` | `number` | `0.6` | Cards outside viewport are hidden (0-1) |
+| `resizeDebounce` | `number` | `80` | Debounce resize events (ms) |
+| `compositingStepFactor` | `number` | `0.5` | Factor for compositing warmup |
+| `compositingPaintInterval` | `number` | `3` | Paint interval for compositing warmup |
 
 ---
 
-## 🚀 Future Enhancements
+## 🎨 Styling
 
-### Version 2.0 Ideas
-- [ ] Support for different card types (video, HTML content)
-- [ ] Custom transitions/effects
-- [ ] Touch gestures (swipe, pinch)
-- [ ] Keyboard navigation
-- [ ] Accessibility improvements (ARIA, keyboard, screen reader)
-- [ ] React/Vue/Angular wrapper components
-- [ ] Plugin system for extensions
-- [ ] Theme presets
-- [ ] Lazy loading for large image sets
-- [ ] Virtual scrolling for 100+ images
+The gallery includes built-in styles that are automatically injected. The CSS is scoped with specific class names to avoid conflicts.
+
+### CSS Classes
+
+- `.ig-stage` - Main gallery container
+- `.ig-cards` - Cards container
+- `.ig-card` - Individual card element
+- `.ig-card__img` - Card image element
+
+You can customize the appearance by overriding these classes in your CSS.
+
+---
+
+## 🔧 Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run the demo
+npm run dev
+
+# Build the library
+npm run build
+
+# Build only TypeScript declarations
+npm run build:types
+
+# Preview the demo build
+npm run preview
+```
+
+---
+
+## 📝 License
+
+MIT © [Your Name]
 
 ---
 
 ## 🤝 Contributing
 
-Once published, contribution guidelines:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](../../issues).
 
 ---
 
-## 📄 License
+## 🙏 Credits
 
-MIT License - See LICENSE file for details
-
----
-
-## 📞 Support
-
-- GitHub Issues: [Report bugs or request features]
-- Documentation: [Link to documentation site]
-- Examples: [Link to examples directory]
+This project is based on the excellent [GradientSlider](https://github.com/clementgrellier/gradientslider) by [Clément Grellier](https://github.com/clementgrellier). Thank you for the amazing work and inspiration!
 
 ---
 
-## ✅ Migration from Current Project
+## 📄 Package Details
 
-### Steps to Convert
-1. Create new branch: `feature/npm-package`
-2. Restructure code as per architecture plan
-3. Implement `InfiniteGallery` class
-4. Add TypeScript types
-5. Configure build system
-6. Write tests
-7. Create examples
-8. Document API
-9. Publish to npm
-
-### Breaking Changes for Users
-- Replace manual script inclusion with npm install
-- Update initialization code to use new API
-- Import styles if not bundling
+- **Package:** `gall3ry`
+- **Version:** 0.0.0
+- **License:** MIT
+- **TypeScript:** Full support
+- **Bundle Size:** ~13KB minified (3.5KB gzipped)
+- **Dependencies:** GSAP (peer dependency)
 
 ---
-
-## 🎯 Success Metrics
-
-- Package downloads (> 1000/month in first year)
-- GitHub stars (> 100)
-- Active issues/PRs
-- Bundle size meets targets
-- Test coverage > 80%
-- Positive user feedback
-
----
-
-*Last Updated: 2025-01-18*
