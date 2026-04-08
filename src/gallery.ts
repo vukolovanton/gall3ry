@@ -183,7 +183,7 @@ export class InfiniteGallery {
 
     // Create stage wrapper
     this.stage = document.createElement("div");
-    this.stage.className = "stage";
+    this.stage.className = "gall3ry-stage";
 
     // Create cards container
     this.cardsRoot = document.createElement("section");
