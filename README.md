@@ -81,7 +81,7 @@ const gallery = new InfiniteGallery({
 await gallery.initialize();
 ```
 
-HTML (simple - minimum required):
+HTML (the only thing you need!):
 
 ```html
 <!DOCTYPE html>
@@ -90,7 +90,8 @@ HTML (simple - minimum required):
   <title>My Gallery</title>
 </head>
 <body>
-  <section id="my-gallery"></section>
+  <!-- Just provide a div with an ID - the library handles the rest -->
+  <div id="my-gallery"></div>
   
   <script type="module">
     import { InfiniteGallery } from 'gall3ry';
@@ -106,34 +107,7 @@ HTML (simple - minimum required):
 </html>
 ```
 
-HTML (with stage wrapper - recommended for better styling context):
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <title>My Gallery</title>
-</head>
-<body>
-  <main class="stage">
-    <section id="my-gallery" class="cards"></section>
-  </main>
-  
-  <script type="module">
-    import { InfiniteGallery } from 'gall3ry';
-    
-    const gallery = new InfiniteGallery({
-      containerId: 'my-gallery',
-      images: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
-    });
-    
-    await gallery.initialize();
-  </script>
-</body>
-</html>
-```
-
-**Note**: The `.stage` wrapper is optional. If present, the library will add the `.carousel-mode` class to it, which you can use for custom styling. The gallery only requires an element with the `containerId` you specify.
+**That's it!** The library automatically creates all necessary internal structure (stage wrapper, cards container, etc.) inside your div. You don't need to worry about the internal HTML structure - just provide a container element with an ID.
 
 ---
 
@@ -398,61 +372,76 @@ gallery.off(event: GalleryEvent, callback: Function): void
 
 ## 🎨 Styling
 
-The gallery includes built-in styles that are **automatically injected** when you import the package. You don't need to include any separate CSS file - the styles are bundled with the JavaScript.
+The library includes built-in styles that are **automatically injected** when you import the package. You don't need to include any separate CSS file - the styles are bundled with the JavaScript.
 
 The CSS uses specific class names and CSS custom properties that you can override for customization.
 
 **Important**: The library does NOT include global resets (like `* { box-sizing: border-box; }`). These styles are scoped to the gallery only and won't affect your page.
 
-### HTML Structure & CSS Classes
+### HTML Structure Created by Library
 
-The library creates the following structure:
+When you initialize the gallery, the library automatically creates this structure inside your container:
 
 ```html
-<!-- Optional: stage wrapper (if found, gets .carousel-mode class added) -->
-<main class="stage carousel-mode">
-  <!-- Required: container element (specified by containerId) -->
-  <section id="your-container-id">
-    <!-- Cards created by the library -->
-    <article class="card">
-      <img class="card__img" src="..." alt="" />
-    </article>
-    <article class="card">
-      <img class="card__img" src="..." alt="" />
-    </article>
-    <!-- ... more cards ... -->
-  </section>
-</main>
+<!-- Your container (you provide this) -->
+<div id="my-gallery">
+  <!-- Library creates this structure automatically -->
+  <div class="stage carousel-mode">
+    <section class="gall3ry-cards" aria-label="Infinite carousel of images">
+      <!-- Cards created by the library -->
+      <article class="gall3ry-card">
+        <img class="gall3ry-card__img" src="..." alt="" />
+      </article>
+      <article class="gall3ry-card">
+        <img class="gall3ry-card__img" src="..." alt="" />
+      </article>
+      <!-- ... more cards ... -->
+    </section>
+  </div>
+</div>
 ```
 
 ### CSS Classes Created by Library
 
-- `.card` - Individual card element
-- `.card__img` - Card image element
-- `.carousel-mode` - Added to the `.stage` element if found (optional)
+- `.stage` - Stage wrapper (auto-created)
+- `.carousel-mode` - Added to stage when gallery is active
+- `.gall3ry-cards` - Cards container (auto-created)
+- `.gall3ry-card` - Individual card element
+- `.gall3ry-card__img` - Card image element
 
-### CSS Classes You Should Provide
-
-- `.stage` - Optional wrapper element for styling context (not required by the library)
-- Your container ID (e.g., `#my-gallery`) - Where cards will be created
-
+You can customize the appearance by overriding these classes and the CSS custom properties in your CSS.
 ### CSS Custom Properties
 
 You can customize the gallery appearance by overriding these CSS custom properties:
 
 ```css
 :root {
-    /* Gallery background and text colors */
-    --gall3ry-bg: #f0f0f0;
-    --gall3ry-fg: #0b0b0b;
-
     /* 3D perspective and animation settings */
     --gall3ry-perspective: 1800px;
     --gall3ry-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 ```
 
-You can customize the appearance by overriding the `.card` and `.card__img` classes and the CSS custom properties in your CSS.
+### Customization Examples
+
+```css
+/* Override card styles */
+.gall3ry-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.gall3ry-card__img {
+    border: 2px solid white;
+}
+
+/* Override stage styles */
+.stage {
+    background: #1a1a2e;
+}
+```
+
+You can customize the appearance by overriding the `.gall3ry-card`, `.gall3ry-card__img`, `.stage`, and `.gall3ry-cards` classes, as well as the CSS custom properties.
 
 ---
 

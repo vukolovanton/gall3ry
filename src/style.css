@@ -8,11 +8,6 @@
 
 /* CSS Custom Properties - Override these to customize appearance */
 :root {
-    /* Gallery background and text colors */
-    --gall3ry-bg: red;
-    --gall3ry-fg: #0b0b0b;
-
-    /* 3D perspective and animation settings */
     --gall3ry-perspective: 1800px;
     --gall3ry-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -33,7 +28,6 @@
     position: relative;
     width: 100%;
     height: 100vh;
-    background: var(--gall3ry-bg);
     overflow: hidden;
     perspective: var(--gall3ry-perspective);
     overscroll-behavior: none;
@@ -114,11 +108,4 @@
         transition: none !important;
         animation: none !important;
     }
-}
-
-.mock-content {
-    display: flex;
-    width: 100%;
-    height: 20vh;
-    background-color: darkcyan;
 }

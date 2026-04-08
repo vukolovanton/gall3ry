@@ -171,16 +171,38 @@ export class InfiniteGallery {
 
   public async initialize(): Promise<void> {
     // Look for the specific container ID provided in config
-    this.cardsRoot = document.getElementById(this.config.containerId);
-    if (!this.cardsRoot) {
+    const userContainer = document.getElementById(this.config.containerId);
+    if (!userContainer) {
       throw new Error(
         `InfiniteGallery: Container with ID "${this.config.containerId}" not found.`,
       );
     }
 
-    // Attempt to find the parent stage element dynamically based on your HTML structure
-    this.stage =
-      this.cardsRoot.closest(".stage") || document.querySelector(".stage");
+    // Preserve any existing attributes from user's container (e.g., aria-live)
+    const ariaLive = userContainer.getAttribute("aria-live");
+
+    // Create stage wrapper
+    this.stage = document.createElement("div");
+    this.stage.className = "stage";
+
+    // Create cards container
+    this.cardsRoot = document.createElement("section");
+    this.cardsRoot.className = "gall3ry-cards";
+    this.cardsRoot.setAttribute("aria-label", "Infinite carousel of images");
+
+    // Clear user container and rebuild structure
+    userContainer.innerHTML = "";
+
+    // Add the stage wrapper to user container
+    userContainer.appendChild(this.stage);
+
+    // Add cards container to stage
+    this.stage.appendChild(this.cardsRoot);
+
+    // Restore aria-live attribute to the user container if it existed
+    if (ariaLive) {
+      userContainer.setAttribute("aria-live", ariaLive);
+    }
 
     this.VW_HALF = window.innerWidth * 0.5;
 
@@ -189,7 +211,7 @@ export class InfiniteGallery {
     this.measure();
     this.updateCarouselTransforms();
 
-    this.stage?.classList.add("carousel-mode");
+    this.stage.classList.add("carousel-mode");
 
     await this.waitForImages();
     await this.decodeAllImages();
