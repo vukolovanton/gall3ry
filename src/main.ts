@@ -65,6 +65,8 @@ const CONFIG = {
   physics: {
     friction: 0.9, // Velocity decay (0-1, lower = more friction)
     wheelSensitivity: 0.6, // Mouse wheel sensitivity
+    wheelMaxDelta: 50, // Maximum delta per wheel event (clamps to prevent physics breaking)
+    wheelMinDelta: 1, // Minimum delta threshold to process (filters out tiny trackpad movements)
     dragSensitivity: 1.0, // Drag sensitivity
     minVelocityThreshold: 0.02, // Minimum velocity before stopping
     frictionDecayBase: 60, // Base for friction decay calculation
@@ -140,16 +142,30 @@ let lastTime = 0; // Last frame timestamp
 // EVENT HANDLERS (stored for cleanup)
 // ============================================================================
 
-// Wheel event handler
+// Wheel event handler with delta normalization
 const handleWheel = (e: Event): void => {
   if (isEntering) return;
   e.preventDefault();
 
   const wheelEvent = e as WheelEvent;
-  const delta =
+
+  // Get the larger of deltaX or deltaY
+  let delta =
     Math.abs(wheelEvent.deltaX) > Math.abs(wheelEvent.deltaY)
       ? wheelEvent.deltaX
       : wheelEvent.deltaY;
+
+  // Apply delta normalization
+  const absDelta = Math.abs(delta);
+
+  // Filter out tiny trackpad movements
+  if (absDelta < CONFIG.physics.wheelMinDelta) return;
+
+  // Clamp maximum delta to prevent physics breaking on cheap mice
+  const sign = Math.sign(delta);
+  delta = sign * Math.min(absDelta, CONFIG.physics.wheelMaxDelta);
+
+  // Apply to velocity
   vX += delta * CONFIG.physics.wheelSensitivity * 20;
 };
 
