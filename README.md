@@ -227,6 +227,34 @@ const gallery = new InfiniteGallery({
 await gallery.initialize();
 ```
 
+### With Auto-Scroll
+
+Enable automatic slow scrolling that pauses when the user interacts:
+
+```typescript
+const gallery = new InfiniteGallery({
+  containerId: 'gallery',
+  images: ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4.jpg'],
+  options: {
+    // Enable auto-scroll
+    autoScrollEnabled: true,     // Enable automatic scrolling
+    autoScrollSpeed: 20,         // Speed in pixels/second (slow)
+    
+    // Other options
+    friction: 0.9,
+    gap: 28,
+  },
+});
+
+await gallery.initialize();
+
+// Auto-scroll behavior:
+// - Gallery scrolls slowly to the right continuously
+// - Pauses when user scrolls with wheel or drags
+// - Resumes after 3 seconds of inactivity
+// - Works seamlessly with manual navigation
+```
+
 ---
 
 ## 📖 API Reference
@@ -367,6 +395,9 @@ gallery.off(event: GalleryEvent, callback: Function): void
 | `resizeDebounce` | `number` | `80` | Debounce resize events (ms) |
 | `compositingStepFactor` | `number` | `0.5` | Factor for compositing warmup |
 | `compositingPaintInterval` | `number` | `3` | Paint interval for compositing warmup |
+| **Auto-Scroll** | | | |
+| `autoScrollEnabled` | `boolean` | `false` | Enable automatic slow scrolling |
+| `autoScrollSpeed` | `number` | `20` | Auto-scroll speed in pixels/second |
 
 ---
 
