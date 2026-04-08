@@ -419,10 +419,69 @@ You can customize the gallery appearance by overriding these CSS custom properti
     /* 3D perspective and animation settings */
     --gall3ry-perspective: 1800px;
     --gall3ry-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Stage settings */
+    --gall3ry-stage-height: 100vh;
+
+    /* Card settings */
+    --gall3ry-card-width: min(26vw, 360px);
+    --gall3ry-card-aspect-ratio: 1/1;
+    --gall3ry-card-border-radius: 15px;
+    --gall3ry-card-transform-origin: 90% center;
 }
 ```
 
-### Customization Examples
+### Customization Methods
+
+#### Method 1: CSS Custom Properties (Recommended)
+
+Override CSS variables in your stylesheet:
+
+```css
+/* Change card dimensions */
+:root {
+    --gall3ry-card-width: min(30vw, 400px);
+    --gall3ry-card-aspect-ratio: 4/5;  /* Portrait cards */
+    --gall3ry-card-border-radius: 20px;
+    --gall3ry-stage-height: 80vh;
+}
+
+/* Or target a specific gallery */
+#my-gallery {
+    --gall3ry-card-width: 300px;
+    --gall3ry-card-aspect-ratio: 16/9;  /* Landscape cards */
+}
+```
+
+#### Method 2: JavaScript Configuration
+
+Set styling options when creating the gallery:
+
+```typescript
+const gallery = new InfiniteGallery({
+  containerId: 'my-gallery',
+  images: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
+  options: {
+    // Card styling
+    cardWidth: '300px',
+    cardAspectRatio: '4/5',
+    cardBorderRadius: '20px',
+    cardTransformOrigin: '50% center',
+    
+    // Stage styling
+    stageHeight: '80vh',
+    
+    // Physics (existing options)
+    friction: 0.9,
+    maxRotation: 28,
+    gap: 28,
+  },
+});
+```
+
+#### Method 3: Override CSS Classes
+
+For more advanced customization, override the CSS classes:
 
 ```css
 /* Override card styles */
@@ -433,15 +492,33 @@ You can customize the gallery appearance by overriding these CSS custom properti
 
 .gall3ry-card__img {
     border: 2px solid white;
+    filter: brightness(1.1);
 }
 
 /* Override stage styles */
-.stage {
+.gall3ry-stage {
     background: #1a1a2e;
 }
 ```
 
-You can customize the appearance by overriding the `.gall3ry-card`, `.gall3ry-card__img`, `.stage`, and `.gall3ry-cards` classes, as well as the CSS custom properties.
+### Available Styling Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| **CSS Variables** | | | |
+| `--gall3ry-card-width` | CSS | `min(26vw, 360px)` | Card width |
+| `--gall3ry-card-aspect-ratio` | CSS | `1/1` | Card aspect ratio (width/height) |
+| `--gall3ry-card-border-radius` | CSS | `15px` | Card border radius |
+| `--gall3ry-card-transform-origin` | CSS | `90% center` | Transform origin point |
+| `--gall3ry-stage-height` | CSS | `100vh` | Stage container height |
+| `--gall3ry-perspective` | CSS | `1800px` | 3D perspective depth |
+| `--gall3ry-ease` | CSS | `cubic-bezier(0.22, 1, 0.36, 1)` | Animation easing |
+| **JS Options** | | | |
+| `cardWidth` | String | `"min(26vw, 360px)"` | Card width |
+| `cardAspectRatio` | String | `"1/1"` | Card aspect ratio |
+| `cardBorderRadius` | String | `"15px"` | Card border radius |
+| `cardTransformOrigin` | String | `"90% center"` | Transform origin |
+| `stageHeight` | String | `"100vh"` | Stage height |
 
 ---
 

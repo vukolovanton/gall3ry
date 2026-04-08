@@ -39,6 +39,11 @@ export interface GalleryOptions {
   resizeDebounce?: number;
   compositingStepFactor?: number;
   compositingPaintInterval?: number;
+  cardWidth?: string;
+  cardAspectRatio?: string;
+  cardBorderRadius?: string;
+  cardTransformOrigin?: string;
+  stageHeight?: string;
 }
 
 export interface GalleryConfig {
@@ -94,6 +99,11 @@ export const DEFAULTS = {
   resizeDebounce: 80,
   compositingStepFactor: 0.5,
   compositingPaintInterval: 3,
+  cardWidth: "min(26vw, 360px)",
+  cardAspectRatio: "1/1",
+  cardBorderRadius: "15px",
+  cardTransformOrigin: "90% center",
+  stageHeight: "100vh",
 };
 
 // ============================================================================
@@ -184,6 +194,28 @@ export class InfiniteGallery {
     // Create stage wrapper
     this.stage = document.createElement("div");
     this.stage.className = "gall3ry-stage";
+
+    // Apply CSS custom properties for customization
+    this.stage.style.setProperty(
+      "--gall3ry-card-width",
+      this.options.cardWidth,
+    );
+    this.stage.style.setProperty(
+      "--gall3ry-card-aspect-ratio",
+      this.options.cardAspectRatio,
+    );
+    this.stage.style.setProperty(
+      "--gall3ry-card-border-radius",
+      this.options.cardBorderRadius,
+    );
+    this.stage.style.setProperty(
+      "--gall3ry-card-transform-origin",
+      this.options.cardTransformOrigin,
+    );
+    this.stage.style.setProperty(
+      "--gall3ry-stage-height",
+      this.options.stageHeight,
+    );
 
     // Create cards container
     this.cardsRoot = document.createElement("section");
