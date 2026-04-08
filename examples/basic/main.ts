@@ -33,11 +33,11 @@ async function runApplication() {
       friction: 0.9,
       maxRotation: 12,
       viewportThreshold: 1.2,
-      maxDepth: 200,
+      maxDepth: 500,
       // Card dimensions can be set here to override CSS media query defaults
       cardWidth: "15vw", // Any valid CSS width: "300px", "20vw", "min(25vw, 400px)"
       gap: 10, // Gap between cards in pixels
-      // cardAspectRatio: "1/1",
+      cardAspectRatio: "9/16",
       // cardBorderRadius: "15px",
       // cardTransformOrigin: "90% center",
       // stageHeight: "100vh",
