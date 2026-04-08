@@ -9,7 +9,7 @@
 /* CSS Custom Properties - Override these to customize appearance */
 :root {
     /* Gallery background and text colors */
-    --gall3ry-bg: #f0f0f0;
+    --gall3ry-bg: red;
     --gall3ry-fg: #0b0b0b;
 
     /* 3D perspective and animation settings */
@@ -31,10 +31,9 @@
 
 .stage {
     position: relative;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     background: var(--gall3ry-bg);
-    color: var(--gall3ry-fg);
     overflow: hidden;
     perspective: var(--gall3ry-perspective);
     overscroll-behavior: none;
@@ -62,7 +61,7 @@
    <section id="your-gallery" class="cards"></section>
    ============================================================================ */
 
-.cards {
+.gall3ry-cards {
     position: absolute;
     inset: 0;
     z-index: 10;
@@ -76,12 +75,12 @@
    You can override these styles to customize the appearance.
    ============================================================================ */
 
-.card {
+.gall3ry-card {
     position: absolute;
     top: 50%;
     left: 50%;
     width: min(26vw, 360px);
-    aspect-ratio: 4/5;
+    aspect-ratio: 1/1;
     isolation: isolate;
     transform-style: preserve-3d;
     backface-visibility: hidden;
@@ -90,7 +89,7 @@
     contain: layout paint; /* Reduce layout/paint scope for performance */
 }
 
-.card__img {
+.gall3ry-card__img {
     border-radius: 15px;
     opacity: 1;
     width: 100%;
@@ -111,18 +110,15 @@
    ============================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    .card {
+    .gall3ry-card {
         transition: none !important;
         animation: none !important;
     }
 }
 
-/* ============================================================================
-   Notes for Users
-   ============================================================================
-   - The library does NOT include global resets (box-sizing, etc.)
-   - Add your own resets to your main stylesheet if needed
-   - Use the CSS custom properties (--gall3ry-*) to customize
-   - Override .card and .card__img classes for custom styling
-   - The .stage wrapper is optional but recommended for better layout
-   ============================================================================ */
+.mock-content {
+    display: flex;
+    width: 100%;
+    height: 20vh;
+    background-color: darkcyan;
+}

@@ -374,11 +374,11 @@ export class InfiniteGallery {
     const fragment = document.createDocumentFragment();
     this.config.images.forEach((src, i) => {
       const card = document.createElement("article");
-      card.className = "card";
+      card.className = "gall3ry-card";
       card.style.opacity = "0";
 
       const img = new Image();
-      img.className = "card__img";
+      img.className = "gall3ry-card__img";
       img.decoding = "async";
       img.loading = "eager";
       img.fetchPriority = "high";
