@@ -22,7 +22,7 @@ async function runApplication() {
       gap: 28, // Distance between cards
       autoScrollEnabled: true,
       autoScrollSpeed: 4000,
-      stageHeight: "20",
+      stageHeight: "20vh",
     },
   });
 
