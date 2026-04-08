@@ -20,6 +20,7 @@ export interface GalleryOptions {
   wheelSensitivity?: number;
   wheelMaxDelta?: number;
   wheelMinDelta?: number;
+  wheelMultiplier?: number;
   dragSensitivity?: number;
   minVelocityThreshold?: number;
   frictionDecayBase?: number;
@@ -82,6 +83,7 @@ export const DEFAULTS = {
   wheelSensitivity: 0.6,
   wheelMaxDelta: 50,
   wheelMinDelta: 1,
+  wheelMultiplier: 20,
   dragSensitivity: 1.0,
   minVelocityThreshold: 0.02,
   frictionDecayBase: 60,
@@ -553,7 +555,8 @@ export class InfiniteGallery {
       this.emit("scrollStart");
     }
 
-    this.vX += delta * this.options.wheelSensitivity * 20;
+    this.vX +=
+      delta * this.options.wheelSensitivity * this.options.wheelMultiplier;
 
     // User has interacted, pause auto-scroll
     this.userInteracted = true;

@@ -34,6 +34,9 @@ async function runApplication() {
       maxRotation: 12,
       viewportThreshold: 1.2,
       maxDepth: 500,
+      wheelSensitivity: 0.3, // Default: 0.6, lower = less sensitive
+      wheelMaxDelta: 50, // Default: 50, lower = less impact from fast scrolls
+      wheelMultiplier: 15, // Default: 20, much lower for smoother feel
       // Card dimensions can be set here to override CSS media query defaults
       cardWidth: "15vw", // Any valid CSS width: "300px", "20vw", "min(25vw, 400px)"
       gap: 10, // Gap between cards in pixels
