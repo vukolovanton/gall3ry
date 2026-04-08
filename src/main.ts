@@ -137,6 +137,89 @@ let lastTime = 0; // Last frame timestamp
 // Background gradient state
 
 // ============================================================================
+// EVENT HANDLERS (stored for cleanup)
+// ============================================================================
+
+// Wheel event handler
+const handleWheel = (e: Event): void => {
+  if (isEntering) return;
+  e.preventDefault();
+
+  const wheelEvent = e as WheelEvent;
+  const delta =
+    Math.abs(wheelEvent.deltaX) > Math.abs(wheelEvent.deltaY)
+      ? wheelEvent.deltaX
+      : wheelEvent.deltaY;
+  vX += delta * CONFIG.physics.wheelSensitivity * 20;
+};
+
+// Drag start handler
+const handleDragStart = (e: Event): void => {
+  e.preventDefault();
+};
+
+// Pointer down handler
+const handlePointerDown = (e: Event): void => {
+  if (isEntering) return;
+  const target = e.target as HTMLElement;
+  if (target.closest(".frame")) return;
+
+  dragging = true;
+  lastX = (e as PointerEvent).clientX;
+  lastT = performance.now();
+  lastDelta = 0;
+  if (stage) {
+    stage.setPointerCapture((e as PointerEvent).pointerId);
+    stage.classList.add("dragging");
+  }
+};
+
+// Pointer move handler
+const handlePointerMove = (e: Event): void => {
+  if (!dragging) return;
+
+  const now = performance.now();
+  const pointerEvent = e as PointerEvent;
+  const dx = pointerEvent.clientX - lastX;
+  const dt = Math.max(1, now - lastT) / 1000;
+
+  SCROLL_X = mod(SCROLL_X - dx * CONFIG.physics.dragSensitivity, TRACK);
+  const MAX_VELOCITY = 5000;
+  lastDelta = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, dx / dt));
+  lastX = pointerEvent.clientX;
+  lastT = now;
+};
+
+// Pointer up handler
+const handlePointerUp = (e: Event): void => {
+  if (!dragging) return;
+  dragging = false;
+  if (stage) {
+    stage.releasePointerCapture((e as PointerEvent).pointerId);
+    stage.classList.remove("dragging");
+  }
+  vX = -lastDelta * CONFIG.physics.dragSensitivity; // Apply final velocity
+};
+
+// Resize handler (debounced wrapper)
+const handleResize = (): void => {
+  clearTimeout((onResize as DebouncedFunction)._t);
+  (onResize as DebouncedFunction)._t = setTimeout(
+    onResize,
+    CONFIG.performance.resizeDebounce,
+  );
+};
+
+// Visibility change handler
+const handleVisibilityChange = (): void => {
+  if (document.hidden) {
+    cancelCarousel();
+  } else {
+    startCarousel();
+  }
+};
+
+// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
@@ -414,24 +497,9 @@ function onResize(): void {
 
 // Mouse wheel scrolling
 if (stage) {
-  stage.addEventListener(
-    "wheel",
-    (e) => {
-      if (isEntering) return;
-      e.preventDefault();
-
-      const wheelEvent = e as WheelEvent;
-      const delta =
-        Math.abs(wheelEvent.deltaX) > Math.abs(wheelEvent.deltaY)
-          ? wheelEvent.deltaX
-          : wheelEvent.deltaY;
-      vX += delta * CONFIG.physics.wheelSensitivity * 20;
-    },
-    { passive: false },
-  );
-
+  stage.addEventListener("wheel", handleWheel, { passive: false });
   // Prevent default drag behavior
-  stage.addEventListener("dragstart", (e) => e.preventDefault());
+  stage.addEventListener("dragstart", handleDragStart);
 }
 
 // Drag state
@@ -442,65 +510,24 @@ let lastDelta = 0;
 
 // Pointer down - start dragging
 if (stage) {
-  stage.addEventListener("pointerdown", (e) => {
-    if (isEntering) return;
-    const target = e.target as HTMLElement;
-    if (target.closest(".frame")) return;
-
-    dragging = true;
-    lastX = (e as PointerEvent).clientX;
-    lastT = performance.now();
-    lastDelta = 0;
-    stage.setPointerCapture((e as PointerEvent).pointerId);
-    stage.classList.add("dragging");
-  });
+  stage.addEventListener("pointerdown", handlePointerDown);
 }
 
 // Pointer move - update scroll position
 if (stage) {
-  stage.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
-
-    const now = performance.now();
-    const pointerEvent = e as PointerEvent;
-    const dx = pointerEvent.clientX - lastX;
-    const dt = Math.max(1, now - lastT) / 1000;
-
-    SCROLL_X = mod(SCROLL_X - dx * CONFIG.physics.dragSensitivity, TRACK);
-    lastDelta = dx / dt; // Track velocity for momentum
-    lastX = pointerEvent.clientX;
-    lastT = now;
-  });
+  stage.addEventListener("pointermove", handlePointerMove);
 }
 
 // Pointer up - apply momentum
 if (stage) {
-  stage.addEventListener("pointerup", (e) => {
-    if (!dragging) return;
-    dragging = false;
-    stage.releasePointerCapture((e as PointerEvent).pointerId);
-    vX = -lastDelta * CONFIG.physics.dragSensitivity; // Apply final velocity
-    stage.classList.remove("dragging");
-  });
+  stage.addEventListener("pointerup", handlePointerUp);
 }
 
 // Debounced resize handler
-window.addEventListener("resize", () => {
-  clearTimeout((onResize as DebouncedFunction)._t);
-  (onResize as DebouncedFunction)._t = setTimeout(
-    onResize,
-    CONFIG.performance.resizeDebounce,
-  );
-});
+window.addEventListener("resize", handleResize);
 
 // Pause animations when tab is hidden
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    cancelCarousel();
-  } else {
-    startCarousel();
-  }
-});
+document.addEventListener("visibilitychange", handleVisibilityChange);
 
 // ============================================================================
 // INITIALIZATION & ENTRY ANIMATION
@@ -710,6 +737,52 @@ async function init() {
     }
   }
 }
+
+// ============================================================================
+// CLEANUP & EXPORTS
+// ============================================================================
+
+/**
+ * Destroy the carousel and clean up all resources
+ * This should be called when navigating away from the page in a SPA
+ */
+export function destroy(): void {
+  console.log("DEBUG: destroy() called, cleaning up carousel");
+
+  // Cancel animation frame
+  cancelCarousel();
+
+  // Clear debounce timer
+  clearTimeout((onResize as DebouncedFunction)._t);
+
+  // Remove event listeners from stage
+  if (stage) {
+    stage.removeEventListener("wheel", handleWheel);
+    stage.removeEventListener("dragstart", handleDragStart);
+    stage.removeEventListener("pointerdown", handlePointerDown);
+    stage.removeEventListener("pointermove", handlePointerMove);
+    stage.removeEventListener("pointerup", handlePointerUp);
+  }
+
+  // Remove event listeners from window and document
+  window.removeEventListener("resize", handleResize);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+  // Clear cards
+  items = [];
+  positions = [];
+
+  // Reset state
+  isEntering = true;
+  dragging = false;
+  vX = 0;
+  SCROLL_X = 0;
+
+  console.log("DEBUG: destroy() complete");
+}
+
+// Export init function for external use
+export { init };
 
 // ============================================================================
 // START APPLICATION
