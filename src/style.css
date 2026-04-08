@@ -1,46 +1,67 @@
-/* Reset & base */
-* {
-    box-sizing: border-box;
-}
-html,
-body {
-    height: 100%;
-}
-body {
-    margin: 0;
-}
+/* ============================================================================
+   gall3ry - CSS Styles
+   ============================================================================
+   These styles are automatically injected when you import the library.
+   Only gallery-specific styles are included - no global resets that would
+   affect your page.
+   ============================================================================ */
 
+/* CSS Custom Properties - Override these to customize appearance */
 :root {
-    --bg: #f0f0f0;
-    --fg: #0b0b0b;
-    --perspective: 1800px;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Gallery background and text colors */
+    --gall3ry-bg: #f0f0f0;
+    --gall3ry-fg: #0b0b0b;
+
+    /* 3D perspective and animation settings */
+    --gall3ry-perspective: 1800px;
+    --gall3ry-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Stage */
+/* ============================================================================
+   Optional Stage Wrapper
+   ============================================================================
+   The .stage class is optional. If present in your HTML, the library will
+   add .carousel-mode to it when the gallery is active.
+
+   Example HTML:
+   <main class="stage">
+     <section id="your-gallery"></section>
+   </main>
+   ============================================================================ */
+
 .stage {
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: var(--bg);
-    color: var(--fg);
+    background: var(--gall3ry-bg);
+    color: var(--gall3ry-fg);
     overflow: hidden;
-    perspective: var(--perspective);
+    perspective: var(--gall3ry-perspective);
     overscroll-behavior: none;
     -webkit-user-select: none;
     user-select: none;
 }
 
-/* Only block native scrolling/gestures in carousel mode */
+/* Carousel mode - added by library when gallery is active */
 .stage.carousel-mode {
     touch-action: none;
     cursor: grab;
 }
+
 .stage.carousel-mode.dragging {
     cursor: grabbing;
 }
 
-/* Cards container */
+/* ============================================================================
+   Cards Container
+   ============================================================================
+   The .cards class is not created by the library, but you can add it to
+   your container element if you want to apply these styles.
+
+   Example HTML:
+   <section id="your-gallery" class="cards"></section>
+   ============================================================================ */
+
 .cards {
     position: absolute;
     inset: 0;
@@ -48,7 +69,13 @@ body {
     transform-style: preserve-3d;
 }
 
-/* Card */
+/* ============================================================================
+   Card (Created by Library)
+   ============================================================================
+   The library creates .card and .card__img elements automatically.
+   You can override these styles to customize the appearance.
+   ============================================================================ */
+
 .card {
     position: absolute;
     top: 50%;
@@ -60,7 +87,7 @@ body {
     backface-visibility: hidden;
     will-change: transform, filter;
     transform-origin: 90% center;
-    contain: layout paint; /* reduce layout/paint scope for perf */
+    contain: layout paint; /* Reduce layout/paint scope for performance */
 }
 
 .card__img {
@@ -73,13 +100,29 @@ body {
     transform: translateZ(0);
     pointer-events: none;
     -webkit-user-drag: none;
+    -webkit-user-select: none;
     user-select: none;
 }
 
-/* Reduced motion */
+/* ============================================================================
+   Accessibility - Reduced Motion
+   ============================================================================
+   Respects user's reduced motion preference
+   ============================================================================ */
+
 @media (prefers-reduced-motion: reduce) {
     .card {
         transition: none !important;
         animation: none !important;
     }
 }
+
+/* ============================================================================
+   Notes for Users
+   ============================================================================
+   - The library does NOT include global resets (box-sizing, etc.)
+   - Add your own resets to your main stylesheet if needed
+   - Use the CSS custom properties (--gall3ry-*) to customize
+   - Override .card and .card__img classes for custom styling
+   - The .stage wrapper is optional but recommended for better layout
+   ============================================================================ */
