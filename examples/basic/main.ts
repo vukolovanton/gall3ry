@@ -20,6 +20,8 @@ async function runApplication() {
       friction: 0.9,
       maxRotation: 28,
       gap: 28, // Distance between cards
+      autoScrollEnabled: true,
+      autoScrollSpeed: 4000,
     },
   });
 

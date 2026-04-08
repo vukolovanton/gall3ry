@@ -44,6 +44,8 @@ export interface GalleryOptions {
   cardBorderRadius?: string;
   cardTransformOrigin?: string;
   stageHeight?: string;
+  autoScrollEnabled?: boolean;
+  autoScrollSpeed?: number;
 }
 
 export interface GalleryConfig {
@@ -104,6 +106,8 @@ export const DEFAULTS = {
   cardBorderRadius: "15px",
   cardTransformOrigin: "90% center",
   stageHeight: "100vh",
+  autoScrollEnabled: false,
+  autoScrollSpeed: 20,
 };
 
 // ============================================================================
@@ -125,6 +129,8 @@ export class InfiniteGallery {
   private dragging: boolean = false;
   private scrolling: boolean = false;
   private activeIndex: number = 0;
+  private userInteracted: boolean = false;
+  private autoScrollResumeTimer: number | null = null;
 
   // Layout measurements
   private CARD_W: number = 300;
@@ -276,6 +282,11 @@ export class InfiniteGallery {
 
     clearTimeout((this.handleResizeBound as DebouncedFunction)._t);
 
+    if (this.autoScrollResumeTimer !== null) {
+      clearTimeout(this.autoScrollResumeTimer);
+      this.autoScrollResumeTimer = null;
+    }
+
     if (this.stage) {
       this.stage.removeEventListener("wheel", this.handleWheelBound as any);
       this.stage.removeEventListener("dragstart", this.handleDragStartBound);
@@ -309,6 +320,7 @@ export class InfiniteGallery {
     this.scrolling = false;
     this.vX = 0;
     this.SCROLL_X = 0;
+    this.userInteracted = false;
 
     this.emit("destroy");
     this.events = {};
@@ -334,6 +346,20 @@ export class InfiniteGallery {
         if (this.scrolling && !this.dragging) {
           this.scrolling = false;
           this.emit("scrollEnd");
+        }
+      }
+
+      // Apply auto-scroll if enabled and user hasn't interacted recently
+      if (
+        this.options.autoScrollEnabled &&
+        !this.userInteracted &&
+        !this.dragging &&
+        Math.abs(this.vX) < this.options.minVelocityThreshold
+      ) {
+        this.vX = this.options.autoScrollSpeed;
+        if (!this.scrolling) {
+          this.scrolling = true;
+          this.emit("scrollStart");
         }
       }
 
@@ -508,6 +534,10 @@ export class InfiniteGallery {
     }
 
     this.vX += delta * this.options.wheelSensitivity * 20;
+
+    // User has interacted, pause auto-scroll
+    this.userInteracted = true;
+    this.resetAutoScrollResumeTimer();
   }
 
   private handleDragStart(e: Event): void {
@@ -531,6 +561,10 @@ export class InfiniteGallery {
       this.stage.setPointerCapture(e.pointerId);
       this.stage.classList.add("dragging");
     }
+
+    // User has interacted, pause auto-scroll
+    this.userInteracted = true;
+    this.resetAutoScrollResumeTimer();
   }
 
   private handlePointerMove(e: PointerEvent): void {
@@ -561,6 +595,17 @@ export class InfiniteGallery {
     }
 
     this.vX = -this.lastDelta * this.options.dragSensitivity;
+  }
+
+  private resetAutoScrollResumeTimer(): void {
+    if (this.autoScrollResumeTimer !== null) {
+      clearTimeout(this.autoScrollResumeTimer);
+    }
+    // Resume auto-scroll after 3 seconds of inactivity
+    this.autoScrollResumeTimer = window.setTimeout(() => {
+      this.userInteracted = false;
+      this.autoScrollResumeTimer = null;
+    }, 3000);
   }
 
   private handleResize(): void {
