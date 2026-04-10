@@ -18,7 +18,6 @@
   // Create and inject style element
   const style = document.createElement("style");
   style.id = styleId;
-  style.textContent = css;
   document.head.appendChild(style);
 })();
 
