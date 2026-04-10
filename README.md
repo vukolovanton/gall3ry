@@ -457,7 +457,6 @@ You can customize the gallery appearance by overriding these CSS custom properti
     /* Card settings */
     --gall3ry-card-width: min(26vw, 360px);
     --gall3ry-card-aspect-ratio: 1/1;
-    --gall3ry-card-border-radius: 15px;
     --gall3ry-card-transform-origin: 90% center;
 }
 ```
@@ -517,7 +516,6 @@ For more advanced customization, override the CSS classes:
 ```css
 /* Override card styles */
 .gall3ry-card {
-    border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
@@ -539,7 +537,6 @@ For more advanced customization, override the CSS classes:
 | **CSS Variables** | | | |
 | `--gall3ry-card-width` | CSS | `min(26vw, 360px)` | Card width |
 | `--gall3ry-card-aspect-ratio` | CSS | `1/1` | Card aspect ratio (width/height) |
-| `--gall3ry-card-border-radius` | CSS | `15px` | Card border radius |
 | `--gall3ry-card-transform-origin` | CSS | `90% center` | Transform origin point |
 | `--gall3ry-stage-height` | CSS | `100vh` | Stage container height |
 | `--gall3ry-perspective` | CSS | `1800px` | 3D perspective depth |

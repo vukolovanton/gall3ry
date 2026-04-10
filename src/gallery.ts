@@ -219,12 +219,7 @@ export class InfiniteGallery {
         this.options.cardAspectRatio,
       );
     }
-    if (this.options.cardBorderRadius) {
-      this.stage.style.setProperty(
-        "--gall3ry-card-border-radius",
-        this.options.cardBorderRadius,
-      );
-    }
+
     if (this.options.cardTransformOrigin) {
       this.stage.style.setProperty(
         "--gall3ry-card-transform-origin",

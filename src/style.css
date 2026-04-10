@@ -17,7 +17,6 @@
 
     /* Card settings - non-responsive values */
     --gall3ry-card-aspect-ratio: 1/1;
-    --gall3ry-card-border-radius: 15px;
     --gall3ry-card-transform-origin: 90% center;
 
     /* Responsive card width and gap - Mobile (Default): Shows ~2 cards */
@@ -121,7 +120,6 @@
 }
 
 .gall3ry-card__img {
-    border-radius: var(--gall3ry-card-border-radius, 15px);
     opacity: 1;
     width: 100%;
     height: 100%;
